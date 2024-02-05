@@ -61,9 +61,6 @@ export default {
                 let a = JSON.stringify(result)
                 let b = JSON.stringify(result.data.content[0])
 
-                console.log("RESULT DATA: " + a)
-                console.log("RESULT DATA 2: " + result.data.content)
-
                 this.products = result.data.content
                 this.totalPages = result.data.totalPages
             } catch(ex) {

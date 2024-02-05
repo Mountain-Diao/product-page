@@ -4,6 +4,10 @@
     </div>
   <form @submit.prevent="callApi">
     <div>
+        <label>Id* : </label>
+        <input type="number" v-model="id" required maxLength positiveInteger/>
+    </div>
+    <div>
         <label>Code* : </label>
         <input type="text" v-model="code" required maxLength/>
     </div>
@@ -17,7 +21,7 @@
     </div>
     <div>
         <label>Price* : </label>
-        <input type="text" v-model="price" required positiveInteger/> 
+        <input type="number" v-model="price" required positiveInteger/> 
     </div>
     <div>
         <label>Brand : </label>
@@ -60,6 +64,7 @@ export default {
             size: 3,
             totalPages: 0,
             products: [],
+            id: null,
             code: null,
             name: null,
             category: null,
@@ -72,6 +77,10 @@ export default {
         }
     },
     validations: {
+        id: {
+            required,
+            positiveInteger,
+        },
         code: {
             required,
             maxLength: maxLength(20),
@@ -110,7 +119,7 @@ export default {
             }
 
 
-            let body = [{
+            let body = {
                 product_brand: this.brand,
                 product_category: this.category,
                 product_code: this.code,
@@ -118,48 +127,24 @@ export default {
                 product_name: this.name,
                 product_origin: this.origin,
                 product_price: this.price,
-            }]
+            }
             console.log(body)
 
             try{
-                let findResult = await javaApi.post(`/product?code=` + this.code)
+                let findResult = await javaApi.get(`/product?id=` + this.id)
 
-                if(result.data.productCode){
-                    let a = JSON.stringify(findResult)
-                    let b = JSON.stringify(findResult.data)
-
-                    console.log("FIND RESULT DATA: " + a)
-                    console.log("FIND RESULT DATA 2: " + b)
-                    console.log("EXISTS!")
-                    await javaApi.put('/products/update', body)
+                if(findResult.data.productCode){
+                    await javaApi.put('/products/update/body?product_id=' + this.id, body)
                 }
                 this.resetTextField()
+                this.$router.push({name: "ProductListing"})
             } catch(ex){
 
             }
 
         },
-
-        firstPage(){
-            this.page = 1
-        },
-
-        previousPage(){
-            if(this.page != 1){
-                this.page -= 1
-            }
-        },
-
-        nextPage(){
-            if(this.page != this.totalPages){
-                this.page += 1
-            }
-        },
-
-        lastPage(){
-            this.page = this.totalPages
-        },
         resetTextField(){
+            this.id = null,
             this.code = null;
             this.name = null;
             this.category=  null;
@@ -193,4 +178,13 @@ input[type = text] {
     text-align: right;
 }
 
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
 </style>
