@@ -13,8 +13,8 @@
             <th>Origin</th>
             <th class="descriptionColumn">Description</th>
         </tr>
-        <tr v-for="product in products" :key="product.productId">
-            <td>{{ product.productId }}</td>
+        <tr v-for="product in products" :key="product.productId" @click="redirectToUpdatePage(product.productId)">
+            <td >{{ product.productId }}</td>
             <td>{{ product.productCode }}</td>
             <td>{{ product.productName }}</td>
             <td>{{ product.productPrice }}</td>
@@ -67,7 +67,9 @@ export default {
 
             }
         },
-
+        redirectToUpdatePage(id){
+            this.$router.push({name: "ProductUpdate", params: {product_id: id}})
+        },
         firstPage(){
             this.page = 1
         },
@@ -86,7 +88,8 @@ export default {
 
         lastPage(){
             this.page = this.totalPages
-        }
+        },
+        
     },
     watch:{
         page(){

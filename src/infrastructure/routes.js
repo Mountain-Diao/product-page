@@ -11,14 +11,15 @@ const routes = [
         component : ProductInsert
     },
     {
-        path : "/listing",
+        path : "",
         name: "ProductListing",
         component : ProductListing
     },
     {
-        path : "/update",
+        path : "/update/:product_id",
         name: "ProductUpdate",
-        component : ProductUpdate
+        component : ProductUpdate,
+        props: true
     }
 ]
 

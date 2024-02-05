@@ -5,7 +5,7 @@
   <form @submit.prevent="callApi">
     <div>
         <label>Id* : </label>
-        <input type="number" v-model="id" required maxLength positiveInteger/>
+        <input readonly type="number" v-model="id"/>
     </div>
     <div>
         <label>Code* : </label>
@@ -57,7 +57,9 @@ export default {
     name: "ProductInsert",
     setup: () => ({ v$: useVuelidate() }),
     components: {},
-    props: {},
+    props: {
+        product_id: { type: String, required: false, default: '' },
+    },
     data: function (){
         return{
             page: 3,
@@ -77,10 +79,6 @@ export default {
         }
     },
     validations: {
-        id: {
-            required,
-            positiveInteger,
-        },
         code: {
             required,
             maxLength: maxLength(20),
@@ -106,7 +104,9 @@ export default {
             maxLength: maxLength(200),
         }
     },
-    created(){
+    async created(){
+        this.id = this.product_id
+        await this.retrieveProductId()
     },
 
     methods:{
@@ -131,10 +131,10 @@ export default {
             console.log(body)
 
             try{
-                let findResult = await javaApi.get(`/product?id=` + this.id)
+                let findResult = await javaApi.get(`/product?id=` + this.product_id)
 
                 if(findResult.data.productCode){
-                    await javaApi.put('/products/update/body?product_id=' + this.id, body)
+                    await javaApi.put('/products/update/body?product_id=' + this.product_id, body)
                 }
                 this.resetTextField()
                 this.$router.push({name: "ProductListing"})
@@ -152,7 +152,21 @@ export default {
             this.brand = null;
             this.origin = null;
             this.description = null;
-        }
+        },
+        async retrieveProductId(){
+            try{
+                let findResult = await javaApi.get(`/product?id=` + this.product_id)
+                this.code = findResult.data.productCode;
+                this.name = findResult.data.productName;
+                this.category=  findResult.data.productCategory;;
+                this.price = findResult.data.productPrice;
+                this.brand = findResult.data.productBrand;
+                this.origin = findResult.data.productOrigin;
+                this.description = findResult.data.productDescription;
+            } catch(ex){
+
+            }
+        },
     },
     watch:{
         
@@ -175,7 +189,11 @@ label {
 input[type = text] {
     display: inline-block;
     width: 200px;
-    text-align: right;
+}
+
+input[type = number] {
+    display: inline-block;
+    width: 200px;
 }
 
 input::-webkit-inner-spin-button {
